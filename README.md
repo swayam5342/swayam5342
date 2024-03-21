@@ -1,7 +1,6 @@
 - 👋 Hi, I’m SWAYAM
 - 👀 I’m interested in BACKEND AND IOT
-- 🌱 I’m currently learning GO AND RUST 
-- 💞️ I’m looking to collaborate on ...
+- 🌱 I’m currently learning Python GO AND              RUST
 - 📫 How to reach me through my email swayamsb50@gmail.com
 - ⚡ Fun fact: ...
 
