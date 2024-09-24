@@ -18,7 +18,7 @@ fn main() {
 
     let Swayam = Programmer {
         name: "Swayam",
-        age: 19,
+        age: 18,
         socials,
         interests: vec![
             "Coding", "Astronomy", "Books", "Music",
