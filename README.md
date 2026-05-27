@@ -1,4 +1,4 @@
-<a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&width=435&lines=👋+Hi,+I+am+Swayam;⌨️+I+like+programming;☕+I+like+coffee;I+am+from+India;🔭+I+am+self-taught;" alt="Typing SVG" /></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&width=435&lines=👋+Hi,+I+am+Swayam;⌨️+I+like+programming;☕+I+like+coffee;I+am+from+India;🔭+I+am+self-taught;" alt="Typing SVG" />
 
 ```rs
 use std::collections::HashMap;
