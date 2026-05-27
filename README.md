@@ -1,4 +1,4 @@
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&center=true&vCenter=true&width=500&lines=👋+Hi,+I'm+Swayam;🧑‍💻+Cybersecurity+%26+Backend+Developer;🤖+AI+Learner;☕+Coffee+Powered;🇮🇳+From+India" alt="Typing SVG" />
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&center=true&vCenter=true&width=500&lines=👋+Hi,+I'm+Swayam;🧑‍💻+Cybersecurity+%26+Backend+Developer;☕+Coffee+Powered;🇮🇳+From+India" alt="Typing SVG" />
 
 # 👨‍💻 About Me
 
@@ -99,9 +99,7 @@ fn main() {
 # 🌐 Connect With Me
 
 [![LinkedIn](https://skillicons.dev/icons?i=linkedin&theme=dark)](https://www.linkedin.com/in/swayam5342)
-
 [![Instagram](https://skillicons.dev/icons?i=instagram&theme=dark)](https://www.instagram.com/swayam5342_/)
-
 [![Discord](https://skillicons.dev/icons?i=discord&theme=dark)](https://discord.com/)
 
 ---
