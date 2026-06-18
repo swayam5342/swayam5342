@@ -86,7 +86,7 @@ fn main() {
 
 # 📊 GitHub Stats
 
-![Swayam's Stats](https://github-readme-stats.vercel.app/api?username=swayam5342&theme=tokyonight&hide_border=true&include_all_commits=true&count_private=true)
+![Swayam's Stats](https://github-readme-stats.vercel.app/api?username=swayam5342&theme=tokyonight&hide_border=true)
 
 ![Swayam's Stats](https://github-readme-streak-stats.herokuapp.com/?user=swayam5342&theme=tokyonight&hide_border=true)
 
