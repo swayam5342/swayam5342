@@ -2,7 +2,7 @@ name: README build
 on:
   push:
     branches:
-      - banner
+      - main
   schedule:
     - cron: "0 4 * * *"
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          ref: banner
+          ref: main
           fetch-depth: 1
       - name: Setup Python
         uses: actions/setup-python@v6
