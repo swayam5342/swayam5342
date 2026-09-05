@@ -21,7 +21,7 @@ text, tspan {white-space: pre;}
 <tspan x="15" y="50">                    _______                  </tspan>
 <tspan x="15" y="70">                   /       \                 </tspan>
 <tspan x="15" y="90">                  /         \                </tspan>
-<tspan x="15" y="110">                  |         |                </tspan>
+<tspan x="15" y="110">                |           |                </tspan>
 <tspan x="15" y="130">              .---------------.              </tspan>
 <tspan x="15" y="150">              |               |              </tspan>
 <tspan x="15" y="170">              |    .-----.    |              </tspan>
