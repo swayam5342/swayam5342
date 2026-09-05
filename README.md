@@ -1,50 +1,12 @@
 <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&center=true&vCenter=true&width=500&lines=👋+Hi,+I'm+Swayam;🧑‍💻+Cybersecurity+%26+Backend+Developer;☕+Coffee+Powered;🇮🇳+From+India" alt="Typing SVG" />
 
 # 👨‍💻 About Me
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./dark_mode.svg">
+  <source media="(prefers-color-scheme: light)" srcset="./light_mode.svg">
+  <img alt="Swayam's GitHub Dashboard" src="./dark_mode.svg">
+</picture>
 
-```rs
-use std::collections::HashMap;
-
-struct Programmer {
-    name: &'static str,
-    age: u32,
-    socials: HashMap<&'static str, &'static str>,
-    interests: Vec<&'static str>,
-    languages: Vec<&'static str>,
-    coffee: bool,
-}
-
-fn main() {
-    let mut socials = HashMap::new();
-
-    socials.insert("Discord", "swayamm5342");
-    socials.insert("Instagram", "swayam5342_");
-    socials.insert("LinkedIn", "swayam5342");
-
-    let swayam = Programmer {
-        name: "Swayam",
-        age: 19,
-        socials,
-        interests: vec![
-            "Cybersecurity",
-            "Backend Development",
-            "AI",
-            "Astronomy",
-            "Books",
-            "Music",
-        ],
-        languages: vec![
-            "Python",
-            "Go",
-            "TypeScript",
-            "Rust",
-        ],
-        coffee: true,
-    };
-
-    println!("Thanks for visiting!");
-}
-```
 
 ---
 
@@ -81,13 +43,6 @@ fn main() {
 <p align="left">
   <img src="https://skillicons.dev/icons?i=python,go,ts,nodejs,mongodb,git,linux,raspberrypi" />
 </p>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./dark_mode.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./light_mode.svg">
-  <img alt="Swayam's GitHub Dashboard" src="./dark_mode.svg">
-</picture>
-
 ---
 
 # 📊 GitHub Stats
