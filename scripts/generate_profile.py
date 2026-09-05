@@ -1,73 +1,58 @@
-import json
 from pathlib import Path
-
 from github_api import get_github_stats
+import json
 
 
-ROOT = Path(__file__).parent.parent
-
-DATA_FILE = ROOT / "data" / "profile.json"
-
-DARK_TEMPLATE = ROOT / "templates" / "dark.svg"
-LIGHT_TEMPLATE = ROOT / "templates" / "light.svg"
-
-DARK_OUTPUT = ROOT / "assets" / "dark_mode.svg"
-LIGHT_OUTPUT = ROOT / "assets" / "light_mode.svg"
-
-
-def load_profile():
-    with open(DATA_FILE, "r", encoding="utf-8") as file:
-        return json.load(file)
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def format_number(number):
     return f"{number:,}"
 
 
-def generate_svg(template_path, output_path, values):
-    content = template_path.read_text(encoding="utf-8")
-
-    for key, value in values.items():
-        placeholder = "{{" + key.upper() + "}}"
-
-        content = content.replace(placeholder, str(value))
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    output_path.write_text(content, encoding="utf-8")
-
-
 def main():
-    profile = load_profile()
+    with open(ROOT / "data" / "profile.json", "r", encoding="utf-8") as f:
+        profile = json.load(f)
 
     print("Fetching GitHub statistics...")
 
     stats = get_github_stats(profile["username"])
 
-    values = {
-        "name": profile["name"],
-        "username": profile["username"],
-        "role": profile["role"],
-        "location": profile["location"],
-        "repositories": format_number(stats["repositories"]),
-        "stars": format_number(stats["stars"]),
-        "followers": format_number(stats["followers"]),
-        "following": format_number(stats["following"]),
-        "contributions": format_number(stats["contributions"]),
-        "current_1": profile["currently"][0],
-        "current_2": profile["currently"][1],
-        "current_3": profile["currently"][2],
+    currently = profile.get("currently", [])
+
+    while len(currently) < 3:
+        currently.append("")
+
+    replacements = {
+        "{{NAME}}": profile["name"],
+        "{{USERNAME}}": profile["username"],
+        "{{ROLE}}": profile["role"],
+        "{{LOCATION}}": profile["location"],
+        "{{UNIVERSITY}}": profile["university"],
+        "{{REPOSITORIES}}": format_number(stats["repositories"]),
+        "{{STARS}}": format_number(stats["stars"]),
+        "{{FOLLOWERS}}": format_number(stats["followers"]),
+        "{{FOLLOWING}}": format_number(stats["following"]),
+        "{{CONTRIBUTIONS}}": format_number(stats["contributions"]),
+        "{{CURRENT_1}}": currently[0],
+        "{{CURRENT_2}}": currently[1],
+        "{{CURRENT_3}}": currently[2],
     }
 
-    print("Generating dark profile...")
+    for theme in ["dark", "light"]:
+        template_path = ROOT / "templates" / f"{theme}.svg"
+        output_path = ROOT / "assets" / f"{theme}_mode.svg"
 
-    generate_svg(DARK_TEMPLATE, DARK_OUTPUT, values)
+        template = template_path.read_text(encoding="utf-8")
 
-    print("Generating light profile...")
+        for key, value in replacements.items():
+            template = template.replace(key, value)
 
-    generate_svg(LIGHT_TEMPLATE, LIGHT_OUTPUT, values)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(template, encoding="utf-8")
 
-    print("Profile successfully generated.")
+        print(f"Generated {output_path}")
+        print(f"Size: {output_path.stat().st_size} bytes")
 
 
 if __name__ == "__main__":
