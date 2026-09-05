@@ -15,6 +15,8 @@ QUERY_COUNT = {
     "recursive_loc": 0,
     "graph_commits": 0,
     "loc_query": 0,
+    "top_language": 0,
+    "streak_counter": 0,
 }
 
 
@@ -309,6 +311,127 @@ def loc_query(
         )
 
 
+def top_language(owner_affiliation, cursor=None, lang_sizes=None):
+    """
+    Uses GitHub's GraphQL v4 API to find the top 3 languages by total bytes written
+    across all owned (non-fork) repositories, as a comma-separated string.
+    """
+    if lang_sizes is None:
+        lang_sizes = {}
+    query_count("top_language")
+    query = """
+    query ($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
+        user(login: $login) {
+            repositories(first: 100, after: $cursor, ownerAffiliations: $owner_affiliation, isFork: false) {
+                edges {
+                    node {
+                        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+                            edges {
+                                size
+                                node {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+                pageInfo {
+                    endCursor
+                    hasNextPage
+                }
+            }
+        }
+    }"""
+    variables = {
+        "owner_affiliation": owner_affiliation,
+        "login": USER_NAME,
+        "cursor": cursor,
+    }
+    request = simple_request(top_language.__name__, query, variables)
+    repos = request.json()["data"]["user"]["repositories"]
+    for edge in repos["edges"]:
+        for lang_edge in edge["node"]["languages"]["edges"]:
+            name = lang_edge["node"]["name"]
+            lang_sizes[name] = lang_sizes.get(name, 0) + lang_edge["size"]
+    if repos["pageInfo"]["hasNextPage"]:
+        return top_language(owner_affiliation, repos["pageInfo"]["endCursor"], lang_sizes)
+    if not lang_sizes:
+        return "N/A"
+    top_3 = sorted(lang_sizes, key=lang_sizes.get, reverse=True)[:3]
+    return ", ".join(top_3)
+
+
+def contribution_days(start_date):
+    """
+    Uses GitHub's GraphQL v4 API to fetch every day's contribution count from
+    account creation until now. contributionsCollection only accepts spans of
+    up to one year, so this walks forward one year at a time.
+    """
+    now = datetime.datetime.utcnow()
+    cursor_start = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
+    days = []
+    query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+        user(login: $login) {
+            contributionsCollection(from: $from, to: $to) {
+                contributionCalendar {
+                    weeks {
+                        contributionDays {
+                            date
+                            contributionCount
+                        }
+                    }
+                }
+            }
+        }
+    }"""
+    while cursor_start < now:
+        window_end = min(cursor_start + relativedelta.relativedelta(years=1), now)
+        query_count("streak_counter")
+        variables = {
+            "login": USER_NAME,
+            "from": cursor_start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "to": window_end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        request = simple_request("streak_counter", query, variables)
+        weeks = request.json()["data"]["user"]["contributionsCollection"][
+            "contributionCalendar"
+        ]["weeks"]
+        for week in weeks:
+            for day in week["contributionDays"]:
+                days.append((day["date"], day["contributionCount"]))
+        cursor_start = window_end
+    return days
+
+
+def streak_counter(start_date):
+    """
+    Returns (current_streak, longest_streak) in days, based on daily contribution counts.
+    """
+    days = contribution_days(start_date)
+    days.sort(key=lambda d: d[0])
+    today = datetime.date.today()
+
+    longest = 0
+    running = 0
+    for date_str, count in days:
+        if datetime.datetime.strptime(date_str, "%Y-%m-%d").date() > today:
+            continue
+        running = running + 1 if count > 0 else 0
+        longest = max(longest, running)
+
+    day_map = {date_str: count for date_str, count in days}
+    cursor = today
+    if day_map.get(cursor.isoformat(), 0) == 0:
+        cursor -= datetime.timedelta(days=1)  # today may not have a contribution yet
+    current = 0
+    while day_map.get(cursor.isoformat(), 0) > 0:
+        current += 1
+        cursor -= datetime.timedelta(days=1)
+
+    return current, longest
+
+
 def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     """
     Checks each repository in edges to see if it has been updated since the last time it was cached
@@ -443,6 +566,8 @@ def svg_overwrite(
     contrib_data,
     follower_data,
     loc_data,
+    lang_data,
+    streak_data,
 ):
     """
     Parse SVG files and update elements with my age, commits, stars, repositories, and lines written
@@ -458,6 +583,8 @@ def svg_overwrite(
     justify_format(root, "loc_data", loc_data[2], 9)
     justify_format(root, "loc_add", loc_data[0])
     justify_format(root, "loc_del", loc_data[1], 7)
+    justify_format(root, "lang_data", lang_data, 30)
+    justify_format(root, "streak_data", streak_data, 10)
     tree.write(filename, encoding="utf-8", xml_declaration=True)
 
 
@@ -593,6 +720,14 @@ if __name__ == "__main__":
         graph_repos_stars, "repos", ["OWNER", "COLLABORATOR", "ORGANIZATION_MEMBER"]
     )
     follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
+    lang_data, lang_time = perf_counter(
+        top_language, ["OWNER", "COLLABORATOR", "ORGANIZATION_MEMBER"]
+    )
+    streak_data, streak_time = perf_counter(streak_counter, acc_date)
+    current_streak, longest_streak = streak_data
+    streak_display = f"{current_streak}d (best {longest_streak}d)"
+    formatter("top language", lang_time)
+    formatter("streak", streak_time)
 
     for index in range(len(total_loc) - 1):
         total_loc[index] = "{:,}".format(
@@ -608,6 +743,8 @@ if __name__ == "__main__":
         contrib_data,
         follower_data,
         total_loc[:-1],
+        lang_data,
+        streak_display,
     )
     svg_overwrite(
         "light_mode.svg",
@@ -618,6 +755,8 @@ if __name__ == "__main__":
         contrib_data,
         follower_data,
         total_loc[:-1],
+        lang_data,
+        streak_display,
     )
 
     print(
@@ -633,6 +772,9 @@ if __name__ == "__main__":
                 + star_time
                 + repo_time
                 + contrib_time
+                + follower_time
+                + lang_time
+                + streak_time
             )
         ),
         " s \033[E\033[E\033[E\033[E\033[E\033[E\033[E\033[E",
