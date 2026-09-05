@@ -1,5 +1,6 @@
 from pathlib import Path
 from github_api import get_github_stats
+from xml.sax.saxutils import escape
 import json
 
 
@@ -38,6 +39,8 @@ def main():
         "{{CURRENT_2}}": currently[1],
         "{{CURRENT_3}}": currently[2],
     }
+
+    replacements = {key: escape(str(value)) for key, value in replacements.items()}
 
     for theme in ["dark", "light"]:
         template_path = ROOT / "templates" / f"{theme}.svg"
