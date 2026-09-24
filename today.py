@@ -18,6 +18,9 @@ QUERY_COUNT = {
     "top_language": 0,
     "streak_counter": 0,
 }
+EXCLUDED_LANGUAGES = {
+    "Jupyter Notebook",
+}
 
 
 def daily_readme(birthday):
@@ -352,9 +355,13 @@ def top_language(owner_affiliation, cursor=None, lang_sizes=None):
     for edge in repos["edges"]:
         for lang_edge in edge["node"]["languages"]["edges"]:
             name = lang_edge["node"]["name"]
+            if name in EXCLUDED_LANGUAGES:
+                continue
             lang_sizes[name] = lang_sizes.get(name, 0) + lang_edge["size"]
     if repos["pageInfo"]["hasNextPage"]:
-        return top_language(owner_affiliation, repos["pageInfo"]["endCursor"], lang_sizes)
+        return top_language(
+            owner_affiliation, repos["pageInfo"]["endCursor"], lang_sizes
+        )
     if not lang_sizes:
         return "N/A"
     top_3 = sorted(lang_sizes, key=lang_sizes.get, reverse=True)[:3]
